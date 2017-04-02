@@ -7,7 +7,7 @@ package com.example.avnee.redditdemo.utils.redditjsonclass;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class Resolution {
+public class Resolution__ {
 
     @SerializedName("url")
     @Expose
@@ -42,6 +42,5 @@ public class Resolution {
     public void setHeight(Integer height) {
         this.height = height;
     }
-
 
 }

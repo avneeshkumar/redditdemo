@@ -24,6 +24,7 @@ import android.widget.Toast;
 
 import com.example.avnee.redditdemo.R;
 import com.example.avnee.redditdemo.utils.RedditService;
+import com.example.avnee.redditdemo.utils.Utils;
 import com.example.avnee.redditdemo.utils.redditjsonclass.Child;
 import com.example.avnee.redditdemo.utils.redditjsonclass.Subredditpost;
 import com.google.gson.Gson;
@@ -70,7 +71,10 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
         subredditname = "alternativeart";
         linlaHeaderProgress = (LinearLayout) findViewById(R.id.linlaHeaderProgress);
-
+        if(!Utils.isNetworkConnected(this)){
+            Toast.makeText(this, "You need internet connection", Toast.LENGTH_SHORT).show();
+            finish();
+        }
 
         Gson gson = new GsonBuilder()
                 .registerTypeAdapter(Boolean.class, booleanAsIntAdapter)
@@ -82,6 +86,7 @@ public class MainActivity extends AppCompatActivity
         listforlistview = new ArrayList<Child>();
         adapter = new StableArrayAdapter(getBaseContext(),listforlistview);
         listview.setAdapter(adapter);
+        makerequest(false);
         listview.setOnScrollListener(new AbsListView.OnScrollListener() {
 
             @Override
@@ -90,7 +95,7 @@ public class MainActivity extends AppCompatActivity
                         && (listview.getLastVisiblePosition() - listview.getHeaderViewsCount() -
                         listview.getFooterViewsCount()) >= (adapter.getCount() - 1)) {
 
-                    //Toast.makeText(getBaseContext(),"Reached end",Toast.LENGTH_LONG).show();
+
                     makerequest(true);
                 }
             }
@@ -101,30 +106,7 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-//        String[] values = new String[] { "Android", "iPhone", "WindowsMobile",
-//                "Blackberry", "WebOS", "Ubuntu", "Windows7", "Max OS X",
-//                "Linux", "OS/2" };
-//        final StableArrayAdapter adapter = new StableArrayAdapter(this,values);
-//        listview.setAdapter(adapter);
-//        listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//
-//            @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
-//            @Override
-//            public void onItemClick(AdapterView<?> parent, final View view,
-//                                    int position, long id) {
-//                final String item = (String) parent.getItemAtPosition(position);
-//                view.animate().setDuration(2000).alpha(0)
-//                        .withEndAction(new Runnable() {
-//                            @Override
-//                            public void run() {
-//                                values.remove(item);
-//                                adapter.notifyDataSetChanged();
-//                                view.setAlpha(1);
-//                            }
-//                        });
-//            }
-//
-//        });
+
 
     }
 

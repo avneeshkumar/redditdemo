@@ -1,0 +1,46 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#000"
+    tools:context="com.example.avnee.redditdemo.activities.FullscreenActivity">
+
+    <!-- The primary full-screen view. This can be replaced with whatever view
+         is needed to present your content, e.g. VideoView, SurfaceView,
+         TextureView, etc. -->
+
+
+    <!-- This FrameLayout insets its children based on system windows using
+         android:fitsSystemWindows. -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true">
+
+        <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" >
+
+            <ImageView
+                android:id="@+id/imgDisplay"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:scaleType="fitCenter" />
+
+            <Button
+                android:id="@+id/btnClose"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginRight="15dp"
+                android:layout_marginTop="15dp"
+                android:paddingTop="2dp"
+                android:paddingBottom="2dp"
+                android:textColor="#ffffff"
+                android:text="Close" />
+
+        </RelativeLayout>
+    </FrameLayout>
+
+</FrameLayout>
