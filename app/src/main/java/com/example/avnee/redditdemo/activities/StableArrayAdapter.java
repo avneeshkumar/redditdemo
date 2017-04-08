@@ -11,6 +11,7 @@ import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ListAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,7 +25,7 @@ import java.util.List;
  * Created by avnee on 4/2/2017.
  */
 
-public class StableArrayAdapter extends ArrayAdapter<Child> {
+public class StableArrayAdapter extends ArrayAdapter<Child> implements ListAdapter {
     private final Context context;
     private final List<Child> posts;
 
@@ -35,19 +36,31 @@ public class StableArrayAdapter extends ArrayAdapter<Child> {
     }
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
-        LayoutInflater inflater = (LayoutInflater) context
-                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View rowView = inflater.inflate(R.layout.content_list, parent, false);
-        TextView textView = (TextView) rowView.findViewById(R.id.firstLine);
-        TextView secodnline = (TextView) rowView.findViewById(R.id.secondLine);
-        ImageView imageView = (ImageView) rowView.findViewById(R.id.icon);
-        textView.setText(posts.get(position).getData().getTitle());
-        secodnline.setText("Comments:"+posts.get(position).getData().getNumComments()+"  Upvotes:"+posts.get(position).getData().getUps()+"  Downvotes:"+posts.get(position).getData().getDowns());
-        if(posts.get(position).getData().getThumbnail()==null || (posts.get(position).getData().getThumbnail()=="")){
-            imageView.setImageResource(R.mipmap.ic_launcher);
+        System.out.println("getView " + position + " " + convertView);
+        ViewHolder holder = null;
+        if(convertView==null)
+        {
+            LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            convertView = inflater.inflate(R.layout.content_list, parent, false);
+            holder = new ViewHolder();
+            holder.firstline = (TextView) convertView.findViewById(R.id.firstLine);
+            holder.secondline = (TextView) convertView.findViewById(R.id.secondLine);
+            holder.imageview = (ImageView) convertView.findViewById(R.id.icon);
+
+            convertView.setTag(holder);
+
         }
         else{
-            Picasso.with(context).load(posts.get(position).getData().getThumbnail()).into(imageView);
+            holder = (ViewHolder)convertView.getTag();
+
+        }
+        holder.firstline.setText(posts.get(position).getData().getTitle());
+        holder.secondline.setText("Comments:"+posts.get(position).getData().getNumComments()+"  Upvotes:"+posts.get(position).getData().getUps()+"  Downvotes:"+posts.get(position).getData().getDowns());
+        if(posts.get(position).getData().getThumbnail()==null || (posts.get(position).getData().getThumbnail()=="")){
+            holder.imageview.setImageResource(R.mipmap.ic_launcher);
+        }
+        else{
+            Picasso.with(context).load(posts.get(position).getData().getThumbnail()).into(holder.imageview);
         }
 
         //imageView.setImageResource(R.mipmap.ic_launcher);
@@ -58,7 +71,7 @@ public class StableArrayAdapter extends ArrayAdapter<Child> {
         } else {
             imageView.setImageResource(R.drawable.ic_menu_manage);
         }*/
-        rowView.setOnClickListener(new View.OnClickListener() {
+        convertView.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
@@ -73,6 +86,13 @@ public class StableArrayAdapter extends ArrayAdapter<Child> {
                 }
             }
         });
-        return rowView;
+        return convertView;
+    }
+
+
+    public static class ViewHolder {
+        public TextView firstline;
+        public TextView secondline;
+        public ImageView imageview;
     }
 }
