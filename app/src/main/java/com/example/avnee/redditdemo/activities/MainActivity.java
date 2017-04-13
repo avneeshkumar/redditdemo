@@ -23,6 +23,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.example.avnee.redditdemo.R;
+import com.example.avnee.redditdemo.utils.OfflineGson;
 import com.example.avnee.redditdemo.utils.RedditService;
 import com.example.avnee.redditdemo.utils.Utils;
 import com.example.avnee.redditdemo.utils.redditjsonclass.Child;
@@ -30,14 +31,19 @@ import com.example.avnee.redditdemo.utils.redditjsonclass.Subredditpost;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.TypeAdapter;
+import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
+import io.realm.Realm;
+import io.realm.RealmResults;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -53,6 +59,8 @@ public class MainActivity extends AppCompatActivity
     StableArrayAdapter adapter;
     String subredditname;
     String lastpost;
+    Gson gson;
+    private Realm realm;
     // CAST THE LINEARLAYOUT HOLDING THE MAIN PROGRESS (SPINNER)
     LinearLayout linlaHeaderProgress;
     @Override
@@ -60,33 +68,44 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Realm.init(this);
         setSupportActionBar(toolbar);
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
-
+        realm = Realm.getDefaultInstance();
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         subredditname = "alternativeart";
         linlaHeaderProgress = (LinearLayout) findViewById(R.id.linlaHeaderProgress);
-        if(!Utils.isNetworkConnected(this)){
-            Toast.makeText(this, "You need internet connection", Toast.LENGTH_SHORT).show();
-            finish();
-        }
-
-        Gson gson = new GsonBuilder()
+        gson = new GsonBuilder()
                 .registerTypeAdapter(Boolean.class, booleanAsIntAdapter)
                 .registerTypeAdapter(boolean.class, booleanAsIntAdapter)
                 .create();
+
+
+
         retrofit = new Retrofit.Builder().baseUrl("https://www.reddit.com/").addConverterFactory(GsonConverterFactory.create(gson)).build();
         redditservice = retrofit.create(RedditService.class);
         listview = (ListView) findViewById(R.id.mainlistview);
         listforlistview = new ArrayList<Child>();
         adapter = new StableArrayAdapter(getBaseContext(),listforlistview);
         listview.setAdapter(adapter);
-        makerequest(false);
+        if(Utils.isNetworkConnected(this)){
+            makerequest(false);
+        }
+        else{
+            final OfflineGson person = realm.where(OfflineGson.class).findFirst();
+            Type listOfTestObject = new TypeToken<ArrayList<Child>>(){}.getType();
+            ArrayList<Child> temp = gson.fromJson(person.getAlternativeart(), listOfTestObject);
+            listforlistview.clear();
+            for (Child child : temp) {
+                listforlistview.add(child);
+            }
+            adapter.notifyDataSetChanged();
+        }
         listview.setOnScrollListener(new AbsListView.OnScrollListener() {
 
             @Override
@@ -96,7 +115,9 @@ public class MainActivity extends AppCompatActivity
                         listview.getFooterViewsCount()) >= (adapter.getCount() - 1)) {
 
 
-                    makerequest(true);
+                        if(Utils.isNetworkConnected(getApplicationContext())){
+                            makerequest(true);
+                        }
                 }
             }
 
@@ -105,6 +126,7 @@ public class MainActivity extends AppCompatActivity
 
             }
         });
+
 
 
 
@@ -150,41 +172,161 @@ public class MainActivity extends AppCompatActivity
 
         if (id == R.id.alternativeart) {
             subredditname = "alternativeart";
-            makerequest(false);
+            if(Utils.isNetworkConnected(this)){
+                makerequest(false);
+            }
+            else{
+                final OfflineGson person = realm.where(OfflineGson.class).findFirst();
+                Type listOfTestObject = new TypeToken<ArrayList<Child>>(){}.getType();
+                ArrayList<Child> temp = gson.fromJson(person.getAlternativeart(), listOfTestObject);
+                listforlistview.clear();
+                for (Child child : temp) {
+                    listforlistview.add(child);
+                }
+                adapter.notifyDataSetChanged();
+            }
 
 
 
         } else if (id == R.id.pics) {
             subredditname = "pics";
-            makerequest(false);
+            if(Utils.isNetworkConnected(this)){
+                makerequest(false);
+            }
+            else{
+                final OfflineGson person = realm.where(OfflineGson.class).findFirst();
+                Type listOfTestObject = new TypeToken<ArrayList<Child>>(){}.getType();
+                ArrayList<Child> temp = gson.fromJson(person.getPics(), listOfTestObject);
+                listforlistview.clear();
+                for (Child child : temp) {
+                    listforlistview.add(child);
+                }
+                adapter.notifyDataSetChanged();
+            }
         } else if (id == R.id.gifs) {
             subredditname = "gifs";
-            makerequest(false);
+            if(Utils.isNetworkConnected(this)){
+                makerequest(false);
+            }
+            else{
+                final OfflineGson person = realm.where(OfflineGson.class).findFirst();
+                Type listOfTestObject = new TypeToken<ArrayList<Child>>(){}.getType();
+                ArrayList<Child> temp = gson.fromJson(person.getGifs(), listOfTestObject);
+                listforlistview.clear();
+                for (Child child : temp) {
+                    listforlistview.add(child);
+                }
+                adapter.notifyDataSetChanged();
+            }
         } else if (id == R.id.adviceanimals) {
             subredditname = "adviceanimals";
-            makerequest(false);
+            if(Utils.isNetworkConnected(this)){
+                makerequest(false);
+            }
+            else{
+                final OfflineGson person = realm.where(OfflineGson.class).findFirst();
+                Type listOfTestObject = new TypeToken<ArrayList<Child>>(){}.getType();
+                ArrayList<Child> temp = gson.fromJson(person.getAdviceanimals(), listOfTestObject);
+                listforlistview.clear();
+                for (Child child : temp) {
+                    listforlistview.add(child);
+                }
+                adapter.notifyDataSetChanged();
+            }
         } else if (id == R.id.cats) {
             subredditname = "cats";
-            makerequest(false);
+            if(Utils.isNetworkConnected(this)){
+                makerequest(false);
+            }
+            else{
+                final OfflineGson person = realm.where(OfflineGson.class).findFirst();
+                Type listOfTestObject = new TypeToken<ArrayList<Child>>(){}.getType();
+                ArrayList<Child> temp = gson.fromJson(person.getCats(), listOfTestObject);
+                listforlistview.clear();
+                for (Child child : temp) {
+                    listforlistview.add(child);
+                }
+                adapter.notifyDataSetChanged();
+            }
         } else if (id == R.id.images) {
             subredditname = "images";
-            makerequest(false);
+            if(Utils.isNetworkConnected(this)){
+                makerequest(false);
+            }
+            else{
+                final OfflineGson person = realm.where(OfflineGson.class).findFirst();
+                Type listOfTestObject = new TypeToken<ArrayList<Child>>(){}.getType();
+                ArrayList<Child> temp = gson.fromJson(person.getImages(), listOfTestObject);
+                listforlistview.clear();
+                for (Child child : temp) {
+                    listforlistview.add(child);
+                }
+                adapter.notifyDataSetChanged();
+            }
         }
         else if (id == R.id.photoshopbattles) {
             subredditname = "photoshopbattles";
-            makerequest(false);
+            if(Utils.isNetworkConnected(this)){
+                makerequest(false);
+            }
+            else{
+                final OfflineGson person = realm.where(OfflineGson.class).findFirst();
+                Type listOfTestObject = new TypeToken<ArrayList<Child>>(){}.getType();
+                ArrayList<Child> temp = gson.fromJson(person.getPhotoshopbattles(), listOfTestObject);
+                listforlistview.clear();
+                for (Child child : temp) {
+                    listforlistview.add(child);
+                }
+                adapter.notifyDataSetChanged();
+            }
         }
         else if (id == R.id.hmmm) {
             subredditname = "hmmm";
-            makerequest(false);
+            if(Utils.isNetworkConnected(this)){
+                makerequest(false);
+            }
+            else{
+                final OfflineGson person = realm.where(OfflineGson.class).findFirst();
+                Type listOfTestObject = new TypeToken<ArrayList<Child>>(){}.getType();
+                ArrayList<Child> temp = gson.fromJson(person.getHmmm(), listOfTestObject);
+                listforlistview.clear();
+                for (Child child : temp) {
+                    listforlistview.add(child);
+                }
+                adapter.notifyDataSetChanged();
+            }
         }
         else if (id == R.id.all) {
             subredditname = "all";
-            makerequest(false);
+            if(Utils.isNetworkConnected(this)){
+                makerequest(false);
+            }
+            else{
+                final OfflineGson person = realm.where(OfflineGson.class).findFirst();
+                Type listOfTestObject = new TypeToken<ArrayList<Child>>(){}.getType();
+                ArrayList<Child> temp = gson.fromJson(person.getAll(), listOfTestObject);
+                listforlistview.clear();
+                for (Child child : temp) {
+                    listforlistview.add(child);
+                }
+                adapter.notifyDataSetChanged();
+            }
         }
         else if (id == R.id.aww) {
             subredditname = "aww";
-            makerequest(false);
+            if(Utils.isNetworkConnected(this)){
+                makerequest(false);
+            }
+            else{
+                final OfflineGson person = realm.where(OfflineGson.class).findFirst();
+                Type listOfTestObject = new TypeToken<ArrayList<Child>>(){}.getType();
+                ArrayList<Child> temp = gson.fromJson(person.getAww(), listOfTestObject);
+                listforlistview.clear();
+                for (Child child : temp) {
+                    listforlistview.add(child);
+                }
+                adapter.notifyDataSetChanged();
+            }
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -227,6 +369,88 @@ public class MainActivity extends AppCompatActivity
                     lastpost=user.getData().getAfter();
                     adapter.notifyDataSetChanged();
                 }
+                final String user_gson = gson.toJson(listforlistview);
+                Long count= realm.where(OfflineGson.class).count();
+                if(count==0){
+                    realm.executeTransaction(new Realm.Transaction() {
+                        @Override
+                        public void execute(Realm realm) {
+                            // Add a person
+                            OfflineGson person = realm.createObject(OfflineGson.class);
+
+                           if(subredditname=="alternativeart"){
+                                person.setAlternativeart(user_gson);
+                           }
+                            if(subredditname=="pics"){
+                                person.setPics(user_gson);
+                            }
+                            if(subredditname=="gifs"){
+                                person.setGifs(user_gson);
+                            }
+                            if(subredditname=="adviceanimals"){
+                                person.setAdviceanimals(user_gson);
+                            }
+                            if(subredditname=="cats"){
+                                person.setCats(user_gson);
+                            }
+                            if(subredditname=="images"){
+                                person.setImages(user_gson);
+                            }
+                            if(subredditname=="photoshopbattles"){
+                                person.setPhotoshopbattles(user_gson);
+                            }
+                            if(subredditname=="hmmm"){
+                                person.setHmmm(user_gson);
+                            }
+                            if(subredditname=="all"){
+                                person.setAll(user_gson);
+                            }
+                            if(subredditname=="aww"){
+                                person.setAww(user_gson);
+                            }
+
+                        }
+                    });
+                }
+                else{
+                    final OfflineGson person = realm.where(OfflineGson.class).findFirst();
+                    realm.executeTransaction(new Realm.Transaction() {
+                        @Override
+                        public void execute(Realm realm) {
+                            if(subredditname=="alternativeart"){
+                                person.setAlternativeart(user_gson);
+                            }
+                            if(subredditname=="pics"){
+                                person.setPics(user_gson);
+                            }
+                            if(subredditname=="gifs"){
+                                person.setGifs(user_gson);
+                            }
+                            if(subredditname=="adviceanimals"){
+                                person.setAdviceanimals(user_gson);
+                            }
+                            if(subredditname=="cats"){
+                                person.setCats(user_gson);
+                            }
+                            if(subredditname=="images"){
+                                person.setImages(user_gson);
+                            }
+                            if(subredditname=="photoshopbattles"){
+                                person.setPhotoshopbattles(user_gson);
+                            }
+                            if(subredditname=="hmmm"){
+                                person.setHmmm(user_gson);
+                            }
+                            if(subredditname=="all"){
+                                person.setAll(user_gson);
+                            }
+                            if(subredditname=="aww"){
+                                person.setAww(user_gson);
+                            }
+                        }
+                    });
+                }
+
 
 
 
