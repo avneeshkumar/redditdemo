@@ -76,7 +76,7 @@ public class StableArrayAdapter extends ArrayAdapter<Child> implements ListAdapt
             @Override
             public void onClick(View v) {
 
-                if(posts.get(position).getData().getPreview().getImages().get(0).getSource()!=null){
+                if(posts.get(position).getData().getPreview()!=null){
                     Intent i = new Intent(context, FullscreenActivity.class);
                     i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     String url = posts.get(position).getData().getPreview().getImages().get(0).getSource().getUrl();
