@@ -1,6 +1,6 @@
 package com.atarashi.picreddit.utils;
 
-import com.orm.SugarRecord;
+
 
 import io.realm.RealmObject;
 

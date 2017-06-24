@@ -34,6 +34,7 @@ import com.facebook.drawee.backends.pipeline.Fresco;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.MobileAds;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.TypeAdapter;
@@ -41,6 +42,7 @@ import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
+import com.kobakei.ratethisapp.RateThisApp;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -88,6 +90,15 @@ public class MainActivity extends AppCompatActivity
         drawer.setDrawerListener(toggle);
         toggle.syncState();
         Fresco.initialize(getApplicationContext());
+        // Custom condition: 3 days and 5 launches
+        RateThisApp.Config config = new RateThisApp.Config(3, 5);
+        RateThisApp.init(config);
+        // Monitor launch times and interval from installation
+        RateThisApp.onCreate(this);
+        // If the condition is satisfied, "Rate this app" dialog will be shown
+
+        FirebaseMessaging.getInstance().subscribeToTopic("all");
+        RateThisApp.showRateDialogIfNeeded(this);
         realm = Realm.getDefaultInstance();
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
