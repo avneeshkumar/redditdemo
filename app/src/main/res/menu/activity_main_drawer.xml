@@ -4,6 +4,12 @@
     <item android:title="Subreddit">
         <menu>
             <item
+                android:id="@+id/popular"
+                android:title="popular" />
+            <item
+                android:id="@+id/all"
+                android:title="all" />
+            <item
                 android:id="@+id/alternativeart"
                 android:title="alternativeart" />
             <item
@@ -24,12 +30,7 @@
             <item
                 android:id="@+id/photoshopbattles"
                 android:title="photoshopbattles" />
-            <item
-                android:id="@+id/hmmm"
-                android:title="hmmm" />
-            <item
-                android:id="@+id/all"
-                android:title="all" />
+
             <item
                 android:id="@+id/aww"
                 android:title="aww" />

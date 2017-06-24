@@ -21,11 +21,23 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" >
 
-            <ImageView
+           <!-- <ImageView
                 android:id="@+id/imgDisplay"
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:scaleType="fitCenter" />
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="fitCenter" />-->
+            <me.relex.photodraweeview.PhotoDraweeView xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:id="@+id/photo_drawee_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:failureImage="@drawable/ic_menu_gallery"
+                app:failureImageScaleType="centerInside"
+                app:placeholderImage="@drawable/ic_menu_gallery"
+                app:placeholderImageScaleType="centerCrop"
+                app:progressBarAutoRotateInterval="1000"
+                app:progressBarImage="@mipmap/ic_launcher_round"
+                app:progressBarImageScaleType="centerInside"/>
 
             <Button
                 android:id="@+id/btnClose"

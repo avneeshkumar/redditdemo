@@ -27,6 +27,7 @@ import com.example.avnee.redditdemo.utils.RedditService;
 import com.example.avnee.redditdemo.utils.Utils;
 import com.example.avnee.redditdemo.utils.redditjsonclass.Child;
 import com.example.avnee.redditdemo.utils.redditjsonclass.Subredditpost;
+import com.facebook.drawee.backends.pipeline.Fresco;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.TypeAdapter;
@@ -66,10 +67,10 @@ public class MainActivity extends AppCompatActivity
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
-
+        Fresco.initialize(getApplicationContext());
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-        subredditname = "alternativeart";
+        subredditname = "popular";
         linlaHeaderProgress = (LinearLayout) findViewById(R.id.linlaHeaderProgress);
         if(!Utils.isNetworkConnected(this)){
             Toast.makeText(this, "You need internet connection", Toast.LENGTH_SHORT).show();
@@ -147,13 +148,13 @@ public class MainActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
-
+        if (id == R.id.popular) {
+            subredditname = "popular";
+            makerequest(false);
+        }
         if (id == R.id.alternativeart) {
             subredditname = "alternativeart";
             makerequest(false);
-
-
-
         } else if (id == R.id.pics) {
             subredditname = "pics";
             makerequest(false);
@@ -172,10 +173,6 @@ public class MainActivity extends AppCompatActivity
         }
         else if (id == R.id.photoshopbattles) {
             subredditname = "photoshopbattles";
-            makerequest(false);
-        }
-        else if (id == R.id.hmmm) {
-            subredditname = "hmmm";
             makerequest(false);
         }
         else if (id == R.id.all) {
