@@ -1,4 +1,4 @@
-package com.example.avnee.redditdemo;
+package com.atarashi.picreddit;
 
 import org.junit.Test;
 
