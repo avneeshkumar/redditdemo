@@ -23,6 +23,8 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.example.avnee.redditdemo.R;
+import com.example.avnee.redditdemo.utils.DAOS;
+import com.example.avnee.redditdemo.utils.OfflineGson;
 import com.example.avnee.redditdemo.utils.RedditService;
 import com.example.avnee.redditdemo.utils.Utils;
 import com.example.avnee.redditdemo.utils.redditjsonclass.Child;
@@ -31,14 +33,19 @@ import com.facebook.drawee.backends.pipeline.Fresco;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.TypeAdapter;
+import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
+import io.realm.Realm;
+import io.realm.RealmResults;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -54,6 +61,9 @@ public class MainActivity extends AppCompatActivity
     StableArrayAdapter adapter;
     String subredditname;
     String lastpost;
+    Gson gson;
+    private Realm realm;
+    DAOS daos;
     // CAST THE LINEARLAYOUT HOLDING THE MAIN PROGRESS (SPINNER)
     LinearLayout linlaHeaderProgress;
     @Override
@@ -61,6 +71,7 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Realm.init(this);
         setSupportActionBar(toolbar);
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -68,26 +79,40 @@ public class MainActivity extends AppCompatActivity
         drawer.setDrawerListener(toggle);
         toggle.syncState();
         Fresco.initialize(getApplicationContext());
+        realm = Realm.getDefaultInstance();
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         subredditname = "popular";
         linlaHeaderProgress = (LinearLayout) findViewById(R.id.linlaHeaderProgress);
-        if(!Utils.isNetworkConnected(this)){
-            Toast.makeText(this, "You need internet connection", Toast.LENGTH_SHORT).show();
-            finish();
-        }
-
-        Gson gson = new GsonBuilder()
+        gson = new GsonBuilder()
                 .registerTypeAdapter(Boolean.class, booleanAsIntAdapter)
                 .registerTypeAdapter(boolean.class, booleanAsIntAdapter)
                 .create();
+
+
+
         retrofit = new Retrofit.Builder().baseUrl("https://www.reddit.com/").addConverterFactory(GsonConverterFactory.create(gson)).build();
         redditservice = retrofit.create(RedditService.class);
         listview = (ListView) findViewById(R.id.mainlistview);
         listforlistview = new ArrayList<Child>();
         adapter = new StableArrayAdapter(getBaseContext(),listforlistview);
         listview.setAdapter(adapter);
-        makerequest(false);
+        daos = new DAOS(realm);
+        if(Utils.isNetworkConnected(this)){
+            makerequest(false);
+        }
+        else{
+
+            listforlistview.clear();
+            ArrayList<Child> temp =  daos.getArray(subredditname,gson);
+            if(temp!=null){
+                for (Child child : temp) {
+                    listforlistview.add(child);
+                }
+            }
+
+            adapter.notifyDataSetChanged();
+        }
         listview.setOnScrollListener(new AbsListView.OnScrollListener() {
 
             @Override
@@ -97,7 +122,9 @@ public class MainActivity extends AppCompatActivity
                         listview.getFooterViewsCount()) >= (adapter.getCount() - 1)) {
 
 
-                    makerequest(true);
+                        if(Utils.isNetworkConnected(getApplicationContext())){
+                            makerequest(true);
+                        }
                 }
             }
 
@@ -106,6 +133,7 @@ public class MainActivity extends AppCompatActivity
 
             }
         });
+
 
 
 
@@ -157,31 +185,47 @@ public class MainActivity extends AppCompatActivity
             makerequest(false);
         } else if (id == R.id.pics) {
             subredditname = "pics";
-            makerequest(false);
+
         } else if (id == R.id.gifs) {
             subredditname = "gifs";
-            makerequest(false);
+
         } else if (id == R.id.adviceanimals) {
             subredditname = "adviceanimals";
-            makerequest(false);
+
         } else if (id == R.id.cats) {
             subredditname = "cats";
-            makerequest(false);
+
         } else if (id == R.id.images) {
             subredditname = "images";
-            makerequest(false);
+
         }
         else if (id == R.id.photoshopbattles) {
             subredditname = "photoshopbattles";
-            makerequest(false);
+
         }
         else if (id == R.id.all) {
             subredditname = "all";
-            makerequest(false);
+
         }
         else if (id == R.id.aww) {
             subredditname = "aww";
+
+        }
+
+        if(Utils.isNetworkConnected(this)){
             makerequest(false);
+        }
+        else{
+
+            listforlistview.clear();
+            ArrayList<Child> temp =  daos.getArray(subredditname,gson);
+            if(temp!=null){
+                for (Child child : temp) {
+                    listforlistview.add(child);
+                }
+            }
+
+            adapter.notifyDataSetChanged();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -224,6 +268,10 @@ public class MainActivity extends AppCompatActivity
                     lastpost=user.getData().getAfter();
                     adapter.notifyDataSetChanged();
                 }
+                final String user_gson = gson.toJson(listforlistview);
+                daos.insert(user_gson,subredditname);
+
+
 
 
 
