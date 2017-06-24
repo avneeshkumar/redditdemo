@@ -164,7 +164,8 @@ public class MainActivity extends AppCompatActivity
     public void  onResume(){
         super.onResume();
         MobileAds.initialize(this, "ca-app-pub-9408156079023384~9468564956");
-        AdRequest adRequest = new AdRequest.Builder().addTestDevice("1A87A77F12C94EB9648BD7C69679A4EE").build();
+        //AdRequest adRequest = new AdRequest.Builder().addTestDevice("1A87A77F12C94EB9648BD7C69679A4EE").build();
+        AdRequest adRequest = new AdRequest.Builder().build();
         mAdView.loadAd(adRequest);
     }
 
